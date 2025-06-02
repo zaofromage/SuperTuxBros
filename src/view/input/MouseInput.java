@@ -25,6 +25,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
             case PLAYING:
                 game.getPlaying().mouseDragged(e);
                 break;
+            case SELECT:
+                game.getSelect().mouseDragged(e);
+                break;
         }
     }
 
@@ -36,6 +39,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
                 break;
             case PLAYING:
                 game.getPlaying().mouseMoved(e);
+                break;
+            case SELECT:
+                game.getSelect().mouseMoved(e);
                 break;
         }
     }
@@ -49,6 +55,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
             case PLAYING:
                 game.getPlaying().mouseClicked(e);
                 break;
+            case SELECT:
+                game.getSelect().mouseClicked(e);
+                break;
         }
     }
 
@@ -60,6 +69,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
                 break;
             case PLAYING:
                 game.getPlaying().mousePressed(e);
+                break;
+            case SELECT:
+                game.getSelect().mousePressed(e);
                 break;
         }
     }
@@ -73,6 +85,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
             case PLAYING:
                 game.getPlaying().mouseReleased(e);
                 break;
+            case SELECT:
+                game.getSelect().mouseReleased(e);
+                break;
         }
     }
 
@@ -85,6 +100,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
             case PLAYING:
                 game.getPlaying().mouseEntered(e);
                 break;
+            case SELECT:
+                game.getSelect().mouseEntered(e);
+                break;
         }
     }
 
@@ -96,6 +114,9 @@ public class MouseInput implements MouseListener, MouseMotionListener {
                 break;
             case PLAYING:
                 game.getPlaying().mouseExited(e);
+                break;
+            case SELECT:
+                game.getSelect().mouseExited(e);
                 break;
         }
     }

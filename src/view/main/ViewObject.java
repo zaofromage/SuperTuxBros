@@ -1,10 +1,11 @@
 package view.main;
 
-import java.awt.*;
+import java.awt.Graphics;
 
 public abstract class ViewObject {
 
     private int id;
+    private boolean destroyed = false;
 
     public ViewObject(int id) {
         this.id = id;
@@ -16,4 +17,11 @@ public abstract class ViewObject {
         return id;
     }
 
+    public void destroy() {
+        destroyed = true;
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
 }

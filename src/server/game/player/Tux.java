@@ -8,11 +8,11 @@ import utils.Vector;
 
 import java.awt.*;
 
-public class Tux extends Player {
+public class Tux extends Character {
 
 
-    public Tux(String name, double x, double y) {
-        super(name, x, y);
+    public Tux(double x, double y) {
+        super(x, y);
     }
 
     @Override

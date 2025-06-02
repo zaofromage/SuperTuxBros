@@ -1,0 +1,17 @@
+launch  | creer les characters apres 3 secondes
+create;
+  structure;x;y;width;height;
+  player;character-string
+jump;playerid
+dash;playerid
+up;playerid
+down;playerid
+left;playerid
+right;playerid
+releaseup;playerid
+releasedown;playerid
+releaseleft;playerid
+releaseright;playerid
+
+upattack;playerid
+

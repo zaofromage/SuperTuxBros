@@ -3,10 +3,10 @@ package view.connection;
 import server.host.ClientHandler;
 import view.gamestate.GameState;
 import view.gamestate.Playing;
-import view.main.ViewObject;
 import view.map.Structure;
 import view.main.Game;
 import view.player.Hitbox;
+import view.player.Character;
 import view.player.Player;
 
 import java.awt.*;
@@ -40,11 +40,21 @@ public class ServerConnection implements Runnable {
                     switch (GameState.state) {
                         case MENU:
                             break;
+                        case SELECT:
+                            switch (header) {
+                                case "playerid":
+                                    game.setPlayer(new Player(Integer.parseInt(body[0])));
+                                    break;
+                                case "launch":
+                                    game.switchState(GameState.PLAYING);
+                                    break;
+                            }
+                            break;
                         case PLAYING:
                             Playing playing = game.getPlaying();
                             switch (header) {
                                 case "destroy":
-                                    playing.removeObject(Integer.parseInt(body[0]));
+                                    playing.getObjects().get(Integer.parseInt(body[0])).destroy();
                                     break;
                                 case "update":
                                     int id = Integer.parseInt(body[1]);
@@ -56,11 +66,11 @@ public class ServerConnection implements Runnable {
                                                 playing.addObject(new Structure(id, Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5])));
                                             }
                                             break;
-                                        case "player":
+                                        case "character":
                                             if (playing.exists(id)) {
-                                                playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5]));
+                                                playing.getPlayers().get(id).set(Double.parseDouble(body[2]), Double.parseDouble(body[3]), Integer.parseInt(body[4]));
                                             } else {
-                                                playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5])));
+                                                playing.addObject(new Character(id, Double.parseDouble(body[2]), Double.parseDouble(body[3]), Integer.parseInt(body[4])));
                                             }
                                             break;
                                         case "hitbox":
@@ -69,6 +79,9 @@ public class ServerConnection implements Runnable {
                                             } else {
                                                 playing.addObject(new Hitbox(id, new Rectangle(Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5]))));
                                             }
+                                            break;
+                                        case "player":
+                                            break;
                                     }
                                     break;
                             }

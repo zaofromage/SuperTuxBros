@@ -1,39 +1,32 @@
 package view.gamestate;
 
-import server.host.Server;
-import server.host.UDPServer;
 import view.UI.Button;
-import view.UI.TextInput;
 import view.connection.Client;
 import view.main.Game;
 import view.main.GamePanel;
 
-import java.awt.*;
+import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Menu implements StateMethods {
+public class SelectCharacter implements StateMethods {
 
     private final Game game;
 
     private List<Button> buttons = new ArrayList<>();
-    private TextInput ip;
 
-    public Menu(Game game) {
+    public SelectCharacter(Game game) {
         this.game = game;
-        buttons.add(new Button(GamePanel.dim.width/2 - 150, 200, 300, 100, Color.GREEN, "HOST", () -> {
-            launchServer();
-            game.switchState(GameState.SELECT);
+        buttons.add(new Button(GamePanel.dim.width - 350, GamePanel.dim.height - 150, 300, 100, Color.GREEN, "LAUNCH", () -> {
+            game.switchState(GameState.PLAYING);
+            Client.getInstance().getSender().send("launch;");
         }));
-        buttons.add(new Button(GamePanel.dim.width/2 - 150, 500, 300, 100, Color.RED, "JOIN", () -> {
-            if (!ip.getText().equals("")) {
-                launchClient();
-                game.switchState(GameState.SELECT);
-            }
+        buttons.add(new Button(GamePanel.dim.width / 2, GamePanel.dim.height/2, 100, 100, Color.PINK, "TUX", () -> {
+            Client.getInstance().getSender().send("create;player;tux");
         }));
-        ip = new TextInput(GamePanel.dim.width/2 - 150, 350, 230, 30, "IP : ", new Font("SansSerif", Font.PLAIN, 25), 15);
     }
 
     @Override
@@ -41,17 +34,6 @@ public class Menu implements StateMethods {
         for (Button button : buttons) {
             button.draw(g);
         }
-        ip.draw(g);
-    }
-
-    public void launchServer() {
-        Server.instantiate();
-        UDPServer.instantiate();
-        Client.instantiate("127.0.0.1", game);
-    }
-
-    public void launchClient() {
-        Client.instantiate(ip.getText(), game);
     }
 
     @Override
@@ -79,7 +61,6 @@ public class Menu implements StateMethods {
         for (Button button : buttons) {
             button.onClick(e);
         }
-        ip.onClick(e);
     }
 
     @Override
@@ -99,7 +80,7 @@ public class Menu implements StateMethods {
 
     @Override
     public void keyPressed(KeyEvent e) {
-        ip.keyPressed(e);
+
     }
 
     @Override

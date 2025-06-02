@@ -1,60 +1,64 @@
 package view.gamestate;
 
 import view.connection.Client;
+import view.main.Game;
 import view.main.ViewObject;
 import view.map.Structure;
 import view.player.Hitbox;
+import view.player.Character;
 import view.player.Player;
 
-import java.awt.*;
+import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Playing implements StateMethods {
 
     private Map<Integer, ViewObject> objects = new HashMap<>();
     private Map<Integer, Structure> structures = new HashMap<>();
-    private Map<Integer, Player> players = new HashMap<>();
+    private Map<Integer, Character> characters = new HashMap<>();
     private Map<Integer, Hitbox> hitboxs = new HashMap<>();
 
     private Player player;
 
-    public Playing() {
-
+    public Playing(Player player) {
+        this.player = player;
     }
 
     public void addObject(ViewObject object) {
         objects.put(object.getId(), object);
         if (object instanceof Structure) {structures.put(object.getId(), (Structure) object);}
-        if (object instanceof Player) {
-            players.put(object.getId(), (Player) object);
-            if (player == null) {
-                player = (Player) object;
-            }
-        }
+        if (object instanceof Character) {characters.put(object.getId(), (Character) object);}
         if (object instanceof Hitbox) {hitboxs.put(object.getId(), (Hitbox) object);}
     }
 
     public void removeObject(ViewObject object) {
         objects.remove(object.getId());
         if (object instanceof Structure) {structures.remove(object.getId());}
-        if (object instanceof Player) {players.remove(object.getId());}
+        if (object instanceof Character) {characters.remove(object.getId());}
         if (object instanceof Hitbox) {hitboxs.remove(object.getId());}
     }
 
     public void removeObject(Integer id) {
         objects.remove(id);
         structures.remove(id);
-        players.remove(id);
+        characters.remove(id);
         hitboxs.remove(id);
     }
 
     @Override
     public void draw(Graphics g) {
+        Game.log(characters.values().toString());
         for (ViewObject object : objects.values()) {
             object.draw(g);
+        }
+        List<ViewObject> toRemove = objects.values().stream().filter(vo -> vo.isDestroyed()).collect(Collectors.toList());
+        for (ViewObject object : toRemove) {
+            removeObject(object);
         }
     }
 
@@ -75,13 +79,7 @@ public class Playing implements StateMethods {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1) {
-            Client.getInstance().getSender().send("create;player;titouan;" + e.getX() + ";" + e.getY());
-        } else if (e.getButton() == MouseEvent.BUTTON2) {
-            Client.getInstance().getSender().send("create;hitbox;" + e.getX() + ";" + e.getY() + ";50;50;-1");
-        } else if (e.getButton() == MouseEvent.BUTTON3) {
-            Client.getInstance().getSender().send("create;structure;" + e.getX() + ";" + e.getY() + ";400;50");
-        }
+
     }
 
     @Override
@@ -139,8 +137,12 @@ public class Playing implements StateMethods {
         }
     }
 
-    public Map<Integer, Player> getPlayers() {
-        return players;
+    public Map<Integer, ViewObject> getObjects() {
+        return objects;
+    }
+
+    public Map<Integer, Character> getPlayers() {
+        return characters;
     }
 
     public Map<Integer, Structure> getStructures() {
@@ -149,6 +151,10 @@ public class Playing implements StateMethods {
 
     public Map<Integer, Hitbox> getHitboxs() {
         return hitboxs;
+    }
+
+    public Player getPlayer() {
+        return player;
     }
 
     public boolean exists(int id) {

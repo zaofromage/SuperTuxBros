@@ -8,8 +8,8 @@ import java.awt.*;
 
 public class GamePanel extends JPanel {
 
-    //public static final Dimension dim = new Dimension(1920, 1080);
-    public static final Dimension dim = new Dimension(500, 500);
+    public static final Dimension dim = new Dimension(1920, 1080);
+    //public static final Dimension dim = new Dimension(500, 500);
 
     private Game game;
 

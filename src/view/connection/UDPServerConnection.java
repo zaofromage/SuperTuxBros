@@ -4,17 +4,15 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.net.SocketException;
 
 import server.host.ClientHandler;
-import server.host.UDPServer;
 import view.gamestate.GameState;
 import view.gamestate.Playing;
 import view.main.Game;
 import view.map.Structure;
 import view.player.Hitbox;
-import view.player.Player;
+import view.player.Character;
 
 public class UDPServerConnection implements Runnable {
 
@@ -59,11 +57,11 @@ public class UDPServerConnection implements Runnable {
                                             playing.addObject(new Structure(id, Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5])));
                                         }
                                         break;
-                                    case "player":
+                                    case "character":
                                         if (playing.exists(id)) {
-                                            playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5]));
+                                            playing.getPlayers().get(id).set(Double.parseDouble(body[2]), Double.parseDouble(body[3]), Integer.parseInt(body[4]));
                                         } else {
-                                            playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5])));
+                                            playing.addObject(new Character(id, Double.parseDouble(body[2]), Double.parseDouble(body[3]), Integer.parseInt(body[4])));
                                         }
                                         break;
                                     case "hitbox":

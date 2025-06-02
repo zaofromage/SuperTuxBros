@@ -2,11 +2,10 @@ package server.game.system;
 
 import server.game.main.Game;
 import server.game.map.Structure;
-import server.game.player.Player;
+import server.game.player.Character;
 
 import java.awt.*;
 import java.util.Collection;
-import java.util.Map;
 
 public class MovementSystem implements System {
 
@@ -14,14 +13,14 @@ public class MovementSystem implements System {
 
     @Override
     public void update(Game game) {
-        for (Player p : game.getPlayers()) {
+        for (Character p : game.getCharacters()) {
             isGrounded(p, game.getStructures());
             movePlayer(p, game.getStructures());
             applyGravity(p, game.getStructures());
         }
     }
 
-    private void movePlayer(Player p, Collection<Structure> structures) {
+    private void movePlayer(Character p, Collection<Structure> structures) {
         double dx = p.getX() + p.getRigidbody().x + p.getDir().x * p.getSpeed() * (p.isInDash() ? p.getDashSpeed() : 1);
         double dy = p.getY() + p.getRigidbody().y + p.getDir().y * p.getSpeed() * (p.isInDash() ? p.getDashSpeed() : 1);
 
@@ -61,15 +60,21 @@ public class MovementSystem implements System {
         }
     }
 
-    private void applyGravity(Player p, Collection<Structure> structures) {
+    private void applyGravity(Character p, Collection<Structure> structures) {
         if (isWalled(p, structures)) {
             p.getRigidbody().y = 1;
         } else {
             p.getRigidbody().y += p.getRigidbody().y < 10 ? 0.5 : 0;
         }
+        double deltaX = 0.5;
+        if (p.getRigidbody().x < deltaX && p.getRigidbody().x > -deltaX) {
+            p.getRigidbody().x = 0;
+        } else {
+            p.getRigidbody().x += p.getRigidbody().x < 0 ? 0.5 : -0.5;
+        }
     }
 
-    public boolean isWalled(Player p, Collection<Structure> structures) {
+    public boolean isWalled(Character p, Collection<Structure> structures) {
         for (Structure s : structures) {
             if (s.getHurtbox().intersects(new Rectangle((int)p.getX() + 1, (int)p.getY(), p.getHurtbox().width, p.getHurtbox().height)) ||
                     s.getHurtbox().intersects(new Rectangle((int)p.getX() - 1, (int)p.getY(), p.getHurtbox().width, p.getHurtbox().height))) { // bas
@@ -79,7 +84,7 @@ public class MovementSystem implements System {
         return false;
     }
 
-    public boolean isGrounded(Player p, Collection<Structure> structures) {
+    public boolean isGrounded(Character p, Collection<Structure> structures) {
         for (Structure s : structures) {
             if (s.getHurtbox().intersects(new Rectangle((int)p.getX(), (int)p.getY()+jumpDelta, p.getHurtbox().width, p.getHurtbox().height)) && s.getHurtbox().y >= p.getY()) { // bas
                 p.setGrounded(true);

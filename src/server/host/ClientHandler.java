@@ -3,6 +3,7 @@ package server.host;
 import server.game.main.Game;
 import server.game.map.Structure;
 import server.game.main.Hitbox;
+import server.game.player.Character;
 import server.game.player.Player;
 import server.game.player.Tux;
 import utils.Vector;
@@ -44,6 +45,10 @@ public class ClientHandler implements Runnable {
                     String header = getHeader(request);
                     String[] body = getBody(request);
                     switch (header) {
+                        case "launch":
+                            game.launch();
+                            send("launch;");
+                            break;
                         case "create":
                             switch (body[0]) {
                                 case "structure":
@@ -51,61 +56,74 @@ public class ClientHandler implements Runnable {
                                     game.addObject(struct);
                                     break;
                                 case "player":
-                                    Player p = new Tux(body[1], Double.parseDouble(body[2]), Double.parseDouble(body[3]));
+                                    Player p = new Player(body[1]);
                                     game.addObject(p);
+                                    sendTo("playerid;" + p.getId());
                                     break;
                                 case "hitbox":
-                                    Player player = Integer.parseInt(body[5]) <= 0 ? (Player) game.getObjects().get(Integer.parseInt(body[5])) : null;
-                                    Hitbox h = new Hitbox(new Rectangle(Integer.parseInt(body[1]), Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4])), new Vector(0, -10), player, 10000);
+                                    Character character = Integer.parseInt(body[5]) <= 0 ? (Character) game.getObjects().get(Integer.parseInt(body[5])) : null;
+                                    Hitbox h = new Hitbox(new Rectangle(Integer.parseInt(body[1]), Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4])), new Vector(0, -10), character, 10000);
                                     game.addObject(h);
+                                    break;
                             }
                             break;
                         // command
                         // move
                         case "jump":
                             Player player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.jump(game.getStructures());
+                            Character character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.jump(game.getStructures());
                             break;
                         case "dash":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.dash();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.dash();
                             break;
                         case "up":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.moveUp();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.moveUp();
                             break;
                         case "releaseup":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.releaseUp();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.releaseUp();
                             break;
                         case "down":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.moveDown();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.moveDown();
                             break;
                         case "releasedown":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.releaseDown();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.releaseDown();
                             break;
                         case "left":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.moveLeft();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.moveLeft();
                             break;
                         case "releaseleft":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.releaseLeft();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.releaseLeft();
                             break;
                         case "right":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.moveRight();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.moveRight();
                             break;
                         case "releaseright":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.releaseRight();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.releaseRight();
                             break;
                         // attack
                         case "upattack":
                             player = (Player) game.getObjects().get(Integer.parseInt(body[0]));
-                            player.upTilt();
+                            character = (Character) game.getObjects().get(player.getCharacterId());
+                            character.upTilt();
                             break;
                     }
                 }
@@ -140,6 +158,10 @@ public class ClientHandler implements Runnable {
         for (ClientHandler c : clients) {
             c.out.println(msg);
         }
+    }
+
+    public void sendTo(String msg) {
+        out.println(msg);
     }
 
     public static String getHeader(String req) {

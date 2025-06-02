@@ -2,7 +2,7 @@ package server.game.system;
 
 import server.game.main.Game;
 import server.game.main.Hitbox;
-import server.game.player.Player;
+import server.game.player.Character;
 
 import java.util.Collection;
 
@@ -10,17 +10,17 @@ public class HitboxSystem implements System {
 
     @Override
     public void update(Game game) {
-        applyHit(game.getPlayers(), game.getHitboxs());
+        applyHit(game.getCharacters(), game.getHitboxs());
     }
 
-    public void applyHit(Collection<Player> players, Collection<Hitbox> hitboxs) {
+    public void applyHit(Collection<Character> characters, Collection<Hitbox> hitboxs) {
         for (Hitbox hitbox : hitboxs) {
-            for (Player player : players) {
-                if (hitbox.getHitbox().intersects(player.getHurtbox())) {
-                    if (hitbox.getImmune() == null || !player.equals(hitbox.getImmune())) {
-                        player.getRigidbody().x = 0;
-                        player.getRigidbody().y = 0;
-                        player.getRigidbody().add(hitbox.getDir());
+            for (Character character : characters) {
+                if (hitbox.getHitbox().intersects(character.getHurtbox())) {
+                    if (hitbox.getImmune() == null || !character.equals(hitbox.getImmune())) {
+                        character.getRigidbody().x = 0;
+                        character.getRigidbody().y = 0;
+                        character.getRigidbody().add(hitbox.getDir());
                         hitbox.destroy();
                     }
                 }

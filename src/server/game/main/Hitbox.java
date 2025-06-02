@@ -1,6 +1,6 @@
 package server.game.main;
 
-import server.game.player.Player;
+import server.game.player.Character;
 import utils.Time;
 import utils.Vector;
 
@@ -12,9 +12,9 @@ public class Hitbox extends GameObject {
     private final Rectangle hitbox;
     private Vector dir;
 
-    private Player immune;
+    private Character immune;
 
-    public Hitbox(Rectangle hitbox, Vector dir, Player immune, int lifetime) {
+    public Hitbox(Rectangle hitbox, Vector dir, Character immune, int lifetime) {
         this.hitbox = hitbox;
         this.dir = dir;
         this.immune = immune;
@@ -39,7 +39,7 @@ public class Hitbox extends GameObject {
         return dir;
     }
 
-    public Player getImmune() {
+    public Character getImmune() {
         return immune;
     }
 
