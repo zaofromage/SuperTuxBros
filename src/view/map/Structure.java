@@ -21,7 +21,7 @@ public class Structure extends ViewObject {
 
     @Override
     public void draw(Graphics g) {
-        g.setColor(Color.RED);
+        g.setColor(Color.YELLOW);
         g.fillRect(x, y, width, height);
     }
 

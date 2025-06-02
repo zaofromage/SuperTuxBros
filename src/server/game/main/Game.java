@@ -2,11 +2,15 @@ package server.game.main;
 
 import server.game.map.Structure;
 import server.game.player.Player;
+import server.game.system.*;
 import server.host.Server;
 import server.host.UDPServer;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.lang.System;
+
+import java.util.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class Game implements GameObject.Listener, Runnable {
 
@@ -20,9 +24,15 @@ public class Game implements GameObject.Listener, Runnable {
 
     private Map<Integer, Structure> structures = new HashMap<>();
     private Map<Integer, Player> players = new HashMap<>();
+    private Map<Integer, Hitbox> hitboxs = new HashMap<>();
+
+    private List<server.game.system.System> systems = List.of(
+            new MovementSystem(),
+            new HitboxSystem()
+    );
 
     public Game() {
-        //addObject(new Structure(200, 800, 1500, 200));
+        GameSpawner.setHitboxAdder(hitbox -> addObject(hitbox));
     }
 
     public void start() {
@@ -31,8 +41,15 @@ public class Game implements GameObject.Listener, Runnable {
     }
 
     public void update() {
+        for (server.game.system.System system : systems) {
+            system.update(this);
+        }
         for (GameObject object : objects.values()) {
             object.update();
+        }
+        List<GameObject> toRemove = objects.values().stream().filter(go -> go.isDestroyed()).collect(Collectors.toList());
+        for (GameObject object : toRemove) {
+            removeObject(object);
         }
     }
 
@@ -41,7 +58,22 @@ public class Game implements GameObject.Listener, Runnable {
         object.addListener(this);
         if (object instanceof Structure) structures.put(object.getId(), (Structure) object);
         if (object instanceof Player) players.put(object.getId(), (Player) object);
+        if (object instanceof Hitbox) hitboxs.put(object.getId(), (Hitbox) object);
         onChange(object);
+    }
+
+    public void removeObject(GameObject object) {
+        objects.remove(object.getId());
+        if (object instanceof Structure) structures.remove(object.getId());
+        if (object instanceof Player) players.remove(object.getId());
+        if (object instanceof Hitbox) hitboxs.remove(object.getId());
+    }
+
+    public void removeObject(Integer id) {
+        objects.remove(id);
+        structures.remove(id);
+        players.remove(id);
+        hitboxs.remove(id);
     }
 
     public void serverUpdate() {
@@ -60,6 +92,10 @@ public class Game implements GameObject.Listener, Runnable {
         UDPServer.getInstance().send(gameObject.getInfo());
     }
 
+    public void onDestroy(GameObject object) {
+        Server.getInstance().send("destroy;" + object.getId());
+    }
+
     @Override
     public void run() {
 
@@ -68,8 +104,6 @@ public class Game implements GameObject.Listener, Runnable {
 
         while (true) {
             long now = System.currentTimeMillis();
-            deltaTime = (now - last) / 1000;
-            last = now;
             update();
 
             long duration = System.currentTimeMillis() - now;
@@ -84,11 +118,19 @@ public class Game implements GameObject.Listener, Runnable {
         }
     }
 
-    public Map<Integer, Structure> getStructures() {
-        return structures;
+    public Map<Integer, GameObject> getObjects() {
+        return objects;
     }
 
-    public Map<Integer, Player> getPlayers() {
-        return players;
+    public Collection<Structure> getStructures() {
+        return structures.values();
+    }
+
+    public Collection<Player> getPlayers() {
+        return players.values();
+    }
+
+    public Collection<Hitbox> getHitboxs() {
+        return hitboxs.values();
     }
 }

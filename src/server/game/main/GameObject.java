@@ -8,6 +8,7 @@ public abstract class GameObject {
     public interface Listener {
         public void onChange(GameObject gameObject);
         public void onChangeUDP(GameObject gameObject);
+        public void onDestroy(GameObject gameObject);
     }
 
     private List<Listener> listeners = new ArrayList<>();
@@ -22,11 +23,29 @@ public abstract class GameObject {
         }
     }
 
+    protected void fireDestroy() {
+        for (Listener listener : listeners) {
+            listener.onDestroy(this);
+        }
+    }
+
     protected void fireChangeUDP() {
         for (Listener listener : listeners) {
             listener.onChangeUDP(this);
         }
     }
+
+    private boolean destroyed = false;
+
+    public void destroy() {
+        destroyed = true;
+        fireDestroy();
+    }
+
+    public boolean isDestroyed() {
+        return destroyed;
+    }
+
 
     private static int counter = 0;
 
@@ -48,5 +67,14 @@ public abstract class GameObject {
 
     public int getId() {
         return id;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof GameObject) {
+            GameObject gameObject = (GameObject) obj;
+            return this.id == gameObject.id;
+        }
+        return false;
     }
 }

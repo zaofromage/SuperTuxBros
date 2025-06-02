@@ -13,7 +13,7 @@ import java.awt.event.MouseEvent;
 public class Menu implements StateMethods {
 
     private final Game game;
-    private final String ip = "192.168.1.106";
+    private final String ip = "192.168.0.88";
 
 
     public Menu(Game game) {

@@ -3,10 +3,13 @@ package view.connection;
 import server.host.ClientHandler;
 import view.gamestate.GameState;
 import view.gamestate.Playing;
+import view.main.ViewObject;
 import view.map.Structure;
 import view.main.Game;
+import view.player.Hitbox;
 import view.player.Player;
 
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -40,6 +43,9 @@ public class ServerConnection implements Runnable {
                         case PLAYING:
                             Playing playing = game.getPlaying();
                             switch (header) {
+                                case "destroy":
+                                    playing.removeObject(Integer.parseInt(body[0]));
+                                    break;
                                 case "update":
                                     int id = Integer.parseInt(body[1]);
                                     switch (body[0]) {
@@ -52,11 +58,17 @@ public class ServerConnection implements Runnable {
                                             break;
                                         case "player":
                                             if (playing.exists(id)) {
-                                                playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]));
+                                                playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5]));
                                             } else {
-                                                playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4])));
+                                                playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5])));
                                             }
                                             break;
+                                        case "hitbox":
+                                            if (playing.exists(id)) {
+                                                playing.getHitboxs().get(id).set(Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5]));
+                                            } else {
+                                                playing.addObject(new Hitbox(id, new Rectangle(Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5]))));
+                                            }
                                     }
                                     break;
                             }

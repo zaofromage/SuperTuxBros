@@ -8,12 +8,14 @@ public class Player extends ViewObject {
 
     private double x, y;
     private String name;
+    private int look;
 
-    public Player(int id, String name, double x, double y) {
+    public Player(int id, String name, double x, double y, int look) {
         super(id);
         this.name = name;
         this.x = x;
         this.y = y;
+        this.look = look;
     }
 
     @Override
@@ -23,10 +25,11 @@ public class Player extends ViewObject {
         g.fillRect((int)x, (int)y, 32, 64);
     }
 
-    public void set(String name, double x, double y) {
+    public void set(String name, double x, double y, int look) {
         this.name = name;
         this.x = x;
         this.y = y;
+        this.look = look;
     }
 
     @Override

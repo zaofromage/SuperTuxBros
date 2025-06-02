@@ -3,6 +3,7 @@ package view.gamestate;
 import view.connection.Client;
 import view.main.ViewObject;
 import view.map.Structure;
+import view.player.Hitbox;
 import view.player.Player;
 
 import java.awt.*;
@@ -16,6 +17,7 @@ public class Playing implements StateMethods {
     private Map<Integer, ViewObject> objects = new HashMap<>();
     private Map<Integer, Structure> structures = new HashMap<>();
     private Map<Integer, Player> players = new HashMap<>();
+    private Map<Integer, Hitbox> hitboxs = new HashMap<>();
 
     private Player player;
 
@@ -32,6 +34,21 @@ public class Playing implements StateMethods {
                 player = (Player) object;
             }
         }
+        if (object instanceof Hitbox) {hitboxs.put(object.getId(), (Hitbox) object);}
+    }
+
+    public void removeObject(ViewObject object) {
+        objects.remove(object.getId());
+        if (object instanceof Structure) {structures.remove(object.getId());}
+        if (object instanceof Player) {players.remove(object.getId());}
+        if (object instanceof Hitbox) {hitboxs.remove(object.getId());}
+    }
+
+    public void removeObject(Integer id) {
+        objects.remove(id);
+        structures.remove(id);
+        players.remove(id);
+        hitboxs.remove(id);
     }
 
     @Override
@@ -60,6 +77,8 @@ public class Playing implements StateMethods {
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
             Client.getInstance().getSender().send("create;player;titouan;" + e.getX() + ";" + e.getY());
+        } else if (e.getButton() == MouseEvent.BUTTON2) {
+            Client.getInstance().getSender().send("create;hitbox;" + e.getX() + ";" + e.getY() + ";50;50;-1");
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             Client.getInstance().getSender().send("create;structure;" + e.getX() + ";" + e.getY() + ";400;50");
         }
@@ -87,6 +106,7 @@ public class Playing implements StateMethods {
 
     @Override
     public void keyPressed(KeyEvent e) {
+        // move
         if (e.getKeyCode() == KeyEvent.VK_SPACE) {
             Client.getInstance().getSender().send("jump;" + player.getId());
         } else if (e.getKeyCode() == KeyEvent.VK_Z) {
@@ -97,6 +117,12 @@ public class Playing implements StateMethods {
             Client.getInstance().getSender().send("left;" + player.getId());
         } else if (e.getKeyCode() == KeyEvent.VK_D) {
             Client.getInstance().getSender().send("right;" + player.getId());
+        } else if (e.getKeyCode() == KeyEvent.VK_SHIFT) {
+            Client.getInstance().getSender().send("dash;" + player.getId());
+        }
+        // attack
+        else if (e.getKeyCode() == KeyEvent.VK_UP) {
+            Client.getInstance().getSender().send("upattack;" + player.getId());
         }
     }
 
@@ -119,6 +145,10 @@ public class Playing implements StateMethods {
 
     public Map<Integer, Structure> getStructures() {
         return structures;
+    }
+
+    public Map<Integer, Hitbox> getHitboxs() {
+        return hitboxs;
     }
 
     public boolean exists(int id) {

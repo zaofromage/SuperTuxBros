@@ -1,5 +1,6 @@
 package view.connection;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -12,6 +13,7 @@ import view.gamestate.GameState;
 import view.gamestate.Playing;
 import view.main.Game;
 import view.map.Structure;
+import view.player.Hitbox;
 import view.player.Player;
 
 public class UDPServerConnection implements Runnable {
@@ -59,11 +61,17 @@ public class UDPServerConnection implements Runnable {
                                         break;
                                     case "player":
                                         if (playing.exists(id)) {
-                                            playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]));
+                                            playing.getPlayers().get(id).set(body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5]));
                                         } else {
-                                            playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4])));
+                                            playing.addObject(new Player(id, body[2], Double.parseDouble(body[3]), Double.parseDouble(body[4]), Integer.parseInt(body[5])));
                                         }
                                         break;
+                                    case "hitbox":
+                                        if (playing.exists(id)) {
+                                            playing.getHitboxs().get(id).set(Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5]));
+                                        } else {
+                                            playing.addObject(new Hitbox(id, new Rectangle(Integer.parseInt(body[2]), Integer.parseInt(body[3]), Integer.parseInt(body[4]), Integer.parseInt(body[5]))));
+                                        }
                                 }
                                 break;
                         }
